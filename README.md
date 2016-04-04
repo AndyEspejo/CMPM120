@@ -1,2 +1,2 @@
-# CMPM120-
+# CMPM120
 Work for CMPM120
