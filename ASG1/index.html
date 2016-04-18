@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+</head>
+<body>
+<canvas id="canvas" width=1000 height=800></canvas>
+<script>
+    var canvas = document.getElementById("canvas");
+    var context = canvas.getContext("2d");
+    var printCollision = false;
+    //Variables and listeners needed for dragging
+    var dragged = false;
+    canvas.addEventListener("mousedown", selectSprite);
+    canvas.addEventListener("mousemove", moveSprite);
+    canvas.addEventListener("mouseup", deselect);
+
+    //Array of picture sources
+    var sources = [];
+    sources.push('http://people.ucsc.edu/~aespejo/120/ASG1/blueSlug.png');
+    sources.push('http://people.ucsc.edu/~aespejo/120/ASG1/yellowSlug.png');
+    sources.push('http://people.ucsc.edu/~aespejo/120/ASG1/redSlug.png');
+    sources.push('http://people.ucsc.edu/~aespejo/120/ASG1/greenSlug.png');
+
+    //Array of the sprites that will be shown
+    //Would like to make this cleaner by making an object function or something
+    //but thought of that too late
+    var sprite = [];
+    var firstDraw = true;
+
+    var blueSlug = new Image();
+    blueSlug.width = 153;
+    blueSlug.height = 153;
+    blueSlug.X = 1;
+    blueSlug.Y = 1;
+    blueSlug.name = blueSlug;
+    blueSlug.src = sources[0];
+    sprite.push(blueSlug);
+
+    var yellowSlug = new Image();
+    yellowSlug.width = 153;
+    yellowSlug.height = 153;
+    yellowSlug.X = 1;
+    yellowSlug.Y = 1;
+    yellowSlug.name = yellowSlug;
+    yellowSlug.src = sources[1];
+    sprite.push(yellowSlug);
+
+    var redSlug = new Image();
+    redSlug.width = 153;
+    redSlug.height = 153;
+    redSlug.X = 1;
+    redSlug.Y = 1;
+    redSlug.name = redSlug;
+    redSlug.src = sources[2];
+    sprite.push(redSlug);
+
+    var greenSlug = new Image();
+    greenSlug.width = 153;
+    greenSlug.height = 153;
+    greenSlug.X = 1;
+    greenSlug.Y = 1;
+    greenSlug.name = greenSlug;
+    greenSlug.src = sources[3];
+    sprite.push(greenSlug);
+
+    //Functions for moving sprites
+    //With help from anonymous @https://piazza.com/class/im4yx3nmz9ozg?cid=77
+    function selectSprite(e) {
+        for (var i = 0; i < sprite.length; i++) {
+            spriteA = sprite[i];
+            if ((spriteA.X < e.clientX && spriteA.X + spriteA.width > e.clientX &&
+                    spriteA.Y < e.clientY && spriteA.Y + spriteA.height > e.clientY)) {
+                dragged = true;
+                dragIndex = i;
+            }
+        }
+    }
+
+    function moveSprite(e) {
+        if (dragged) {
+            doMove(sprite[dragIndex], e.clientX, e.clientY);
+        }
+    }
+
+    function doMove(sprite, mouseX, mouseY) {
+        sprite.X = mouseX - sprite.height / 2;
+        sprite.Y = mouseY - sprite.width / 2
+    }
+
+    function deselect(e) {
+        spriteA = sprite[dragIndex];
+        dragged = false;
+        printCollision = false;
+        for (var i = 0; i < sprite.length; i++) {
+            spriteB = sprite[i];
+            if (collide(spriteA, spriteB) && !(spriteA == spriteB)) {
+                printCollision = true;
+                console.log("Collision!");
+            }
+        }
+    }
+
+    function collide(spriteA, spriteB) {
+        return (spriteA.X < spriteB.X + spriteB.width && spriteA.X + spriteA.width > spriteB.X &&
+        spriteA.Y < spriteB.Y + spriteB.height && spriteA.Y + spriteA.height > spriteB.Y);
+
+    }
+
+    function draw() {
+        canvas.width = canvas.width;
+        for (var i = 0; i < sprite.length; i++) {
+            if (i > 0 && firstDraw == true) {
+                sprite[i].Y = sprite[i - 1].Y + sprite[i].height;
+                context.drawImage(sprite[i], sprite[i].X, sprite[i].Y);
+            } else {
+                context.drawImage(sprite[i], sprite[i].X, sprite[i].Y);
+            }
+
+        }
+        if (printCollision) {
+            context.font = "30px Verdana";
+            context.fillText("Color Mixture Detected!", 200, 300);
+        } else {
+            context.font = "30px Verdana";
+            context.fillText("No Color Mixture Detected!", 200, 300);
+        }
+        firstDraw = false;
+    }
+
+    function update() {}
+
+    function game_loop() {
+        update();
+        draw();
+    }
+    setInterval(game_loop, 30);
+
+</script>
+</body>
+</html>
