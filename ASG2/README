@@ -1,0 +1,39 @@
+Assignment Details:
+
+Assignment 2: Endless Runner
+ 
+Assignment 2: Endless Runner
+Programming Assignment: Helicopter
+BASIC PARTICLE SYSTEM + COLLISION + ANIMATION
+ DUE: Monday, April 25th at 5 PM via eCommons (submission locker will open closer to deadline)
+ 
+ 
+You can think of the obstacles in an endless runner as a particle system where a small number of obstacles are moving along the screen and then get recycled. One example of this is the helicopter game where you can look at the rectangular obstacles as particles that get reset by changing their dimensions and vertical positions. Over time the particle system emitter increases the number and speed of movement for the obstacles. 
+ 
+For this assignment, you will use your knowledge of creating a Particle System, handling collisions, getting mouse or keyboard input, and sprite rendering to create an endless runner like game. As a baseline, you will recreate Helicopter but we would like you to be creative and go beyond the basic requirements of the assignment. 
+ 
+Basic Requirements 
+* Particle System of obstacles
+* Collision checking with obstacles
+* Movement input for the runner
+* Distance display 
+BONUS
+* Animation with SpriteSheets
+* More interesting level geometry
+
+What to submit
+Submission is to be done individually through the eCommons class page (locker will open closer to the deadline). You will upload a zip file containing your project folder that includes all the necessary code, image, and library files for running your project.
+ 
+Evaluation Criteria
+Grading will follow these guidelines:
+ 
+Properly submitted zip file with your code on eCommons (Also include your JSFiddle project link) (5%)
+Solution folder opens with all necessary files needed for the project including content  (15%)
+Project compiles and runs without any changes on the lab machines (10%) -- This is important. Check your submission on a different computer before you submit
+Correct implementation of basic rendering and layout of the runner game (40%)
+ Obstacle system (20%)
+Collision (15%)
+Basic input system (5%)
+Changing level parameters over time and distance display (20%)
+Creativity (10%)
+ 
