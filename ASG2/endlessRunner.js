@@ -10,16 +10,16 @@ function Obstacle(lifeTime, speed, color, width, height, x, y, period) {
     this.height = height;
     this.x = x;
     this.y = y;
+    this.period = period;
 }
-
 
 function obstacleSystem(numObstacles) {
     for(var i = 0; i < numObstacles; i++){
-        obstacles.push(new Obstacle(Math.random()*10,Math.random()*10, "red",
-            10, 10, canvas.width, Math.random()*canvas.height ), 2)
+        obstacles.push(new Obstacle(Math.random()*10, 15 - Math.random()*10, "red",
+            10, 10, canvas.width, Math.random()*canvas.height,10 ))
     }
 }
-obstacleSystem(50);
+obstacleSystem(10);
 
 
 function draw() {
@@ -37,12 +37,25 @@ function draw() {
 
 function update() {
     for(var i = 0; i < obstacles.length; i++){
-        if( obstacles[i].x > 0) {
+        if( obstacles[i].x > 0 && obstacles[i].period >= 0) {
             obstacles[i].x -= obstacles[i].speed;
+            obstacles[i].y += obstacles[i].speed * .3;
+            obstacles[i].period--;
+            if(obstacles[i].period == 0 ) {
+                obstacles[i].period = -10;
+            }
+        }else if(obstacles[i].x > 0 && obstacles[i].period < 0){
+            obstacles[i].x -= obstacles[i].speed;
+            obstacles[i].y -= obstacles[i].speed * .3;
+            obstacles[i].period++;
+            if(obstacles[i].period == 0 ) {
+                obstacles[i].period = 10;
+            }
         }else{
             obstacles[i].x = canvas.width;
             obstacles[i].lifeTime = canvas.width;
             obstacles[i].y = Math.random()*canvas.height;
+            obstacles[i].period = 10;
         }
     }
 
