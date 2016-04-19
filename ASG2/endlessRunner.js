@@ -21,7 +21,9 @@ function PlayerFish(src){
     image.src = src;
     
     this.draw = function(x, y){
-	context.drawImage(image, x, y,);	
+			context.drawImage(image, x, y);	
+      contextfont="20px Georgia";
+			context.fillText("TEST",100,400);
     }
     
     this.update = function(){
@@ -41,7 +43,7 @@ function obstacleSystem(numObstacles) {
 }
 
 obstacleSystem(10);
-var player = new PlayerFish("http://people.ucsc.edu/~aespejo/120/ASG2/Fish2.png";
+var player = new PlayerFish("http://people.ucsc.edu/~aespejo/120/ASG2/Fish2.png");
 
 
 function draw() {
