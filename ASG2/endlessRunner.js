@@ -1,17 +1,23 @@
-var canvas = document.getElementById("myCanvas");
+Ivar canvas = document.getElementById("myCanvas");
 var context = canvas.getContext("2d");
 obstacles = [];
 
 //The obstacle object, can be used to produce different types of obstacles
-function Obstacle(lifeTime, speed, color, width, height, x, y, period) {
+function Obstacle(lifeTime, speed, width, height, x, y, period) {
     this.lifeTime = lifeTime;
     this.speed = speed;
-    this.color = color;
     this.width = width;
     this.height = height;
     this.x = x;
     this.y = y;
     this.period = period;
+    
+    var trashImage = new Image();
+    trashImage.src = "http://people.ucsc.edu/~aespejo/120/ASG2/plasticBottle.png";
+    
+    this.draw = function(x, y){
+    	context.drawImage(trashImage, x, y);
+    }
 }
 
 //Object for the playable fish
@@ -21,9 +27,9 @@ function PlayerFish(src){
     image.src = src;
     
     this.draw = function(x, y){
-			context.drawImage(image, x, y);	
-      contextfont="20px Georgia";
-			context.fillText("TEST",100,400);
+        context.drawImage(image, x, y);	
+        contextfont="20px Georgia";
+        context.fillText("TEST",100,400);
     }
     
     this.update = function(){
@@ -37,7 +43,7 @@ function PlayerFish(src){
 //Takes in a number and creates that number of obstacles, then puts it in the array
 function obstacleSystem(numObstacles) {
     for(var i = 0; i < numObstacles; i++){
-        obstacles.push(new Obstacle(Math.random()*10, 15 - Math.random()*10, "red",
+        obstacles.push(new Obstacle(Math.random()*10, 15 - Math.random()*10,
             10, 10, canvas.width, Math.random()*canvas.height,10 ))
     }
 }
@@ -54,9 +60,7 @@ function draw() {
     player.draw(0,0);
     for(var i = 0; i < obstacles.length; i++){
         var obst  = obstacles[i];
-        context.fillStyle = "red";
-        context.rect(obst.x, obst.y, obst.width, obst.height);
-        context.fill();
+        obst.draw(obst.x, obst.y);
     }
 }
 
