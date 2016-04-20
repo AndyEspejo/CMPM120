@@ -1,10 +1,10 @@
-Ivar canvas = document.getElementById("myCanvas");
+var canvas = document.getElementById("myCanvas");
 var context = canvas.getContext("2d");
 obstacles = [];
-
+bgImage  = new Image();
+bgImage.src = "http://people.ucsc.edu/~aespejo/120/ASG2/TilingSeabed.png";
 //The obstacle object, can be used to produce different types of obstacles
 function Obstacle(lifeTime, speed, width, height, x, y, period) {
-    this.lifeTime = lifeTime;
     this.speed = speed;
     this.width = width;
     this.height = height;
@@ -54,8 +54,7 @@ var player = new PlayerFish("http://people.ucsc.edu/~aespejo/120/ASG2/Fish2.png"
 
 function draw() {
     canvas.width = canvas.width;
-    context.fillStyle = 'blue';
-    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.drawImage(bgImage, 0, 0);
     
     player.draw(0,0);
     for(var i = 0; i < obstacles.length; i++){
