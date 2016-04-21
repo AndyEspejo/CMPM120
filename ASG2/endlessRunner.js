@@ -3,6 +3,8 @@ var context = canvas.getContext("2d");
 obstacles = [];
 bgImage  = new Image();
 bgImage.src = "http://people.ucsc.edu/~aespejo/120/ASG2/TilingSeabed.png";
+
+var score = 0;
 //The obstacle object, can be used to produce different types of obstacles
 function Obstacle(lifeTime, speed, width, height, x, y, period) {
     this.speed = speed;
@@ -14,30 +16,20 @@ function Obstacle(lifeTime, speed, width, height, x, y, period) {
     
     var trashImage = new Image();
     trashImage.src = "http://people.ucsc.edu/~aespejo/120/ASG2/plasticBottle.png";
-    
+    this.trashImage = trashImage;
     this.draw = function(x, y){
     	context.drawImage(trashImage, x, y);
     }
 }
 
 //Object for the playable fish
-function PlayerFish(src){
+function PlayerFish(src, x, y){
     var hp = 100;
-    var image = new Image();
-    image.src = src;
-    
-    this.draw = function(x, y){
-        context.drawImage(image, x, y);	
-        contextfont="20px Georgia";
-        context.fillText("TEST",100,400);
-    }
-    
-    this.update = function(){
-    	while(hp > 0){
-    	//Add movement
-    	}
-    }
-    
+    var is_alive = true;
+    this.x = x;
+    this.y = y;
+    this.image = new Image();
+    this.image.src = src;
 }
 
 //Takes in a number and creates that number of obstacles, then puts it in the array
@@ -49,21 +41,40 @@ function obstacleSystem(numObstacles) {
 }
 
 obstacleSystem(10);
-var player = new PlayerFish("http://people.ucsc.edu/~aespejo/120/ASG2/Fish2.png");
+var player = new PlayerFish("http://people.ucsc.edu/~aespejo/120/ASG2/Fish2.png", 0, 0);
 
 
 function draw() {
-    canvas.width = canvas.width;
     context.drawImage(bgImage, 0, 0);
-    
-    player.draw(0,0);
+    context.fillText(score,400,50);
+
+    contextfont="20px Georgia";
+    context.drawImage(player.image, player.x, player.y);
     for(var i = 0; i < obstacles.length; i++){
         var obst  = obstacles[i];
         obst.draw(obst.x, obst.y);
     }
 }
 
+document.addEventListener("keydown", handleKeyDown);
+
+function handleKeyDown(e) {
+    switch(e.keyCode){
+        case 37: player.x -= 5;
+        break;
+        case 39: player.x += 5;
+        break;
+        case 38: player.y -= 5;
+        break;
+        case 40: player.y += 5;
+        break;
+    }
+
+
+
+}
 function update() {
+    //Update for the obstacles
     for(var i = 0; i < obstacles.length; i++){
         if( obstacles[i].x > 0 && obstacles[i].period >= 0) {
             obstacles[i].x -= obstacles[i].speed;
@@ -84,9 +95,28 @@ function update() {
             obstacles[i].lifeTime = canvas.width;
             obstacles[i].y = Math.random()*canvas.height;
             obstacles[i].period = 10;
+            score += 1;
+        }
+        if(isCollide(player,obstacles[i])){
+            player.hp -= 1;
+            console.log("COLLISION");
         }
     }
+    //Checking if fish collides with obstacles
 
+
+
+}
+
+function isCollide(pFish, trash) {
+    if(pFish.x < trash.x + trash.trashImage.width &&
+        pFish.x + pFish.image.width > trash.x &&
+        pFish.y < trash.y + trash.trashImage.height &&
+        pFish.y + pFish.image.height > trash.y){
+        return true;
+    }else{
+        return false;
+    }
 }
 
 function game_loop() {
