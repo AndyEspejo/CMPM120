@@ -24,7 +24,7 @@ function Obstacle(lifeTime, speed, width, height, x, y, period) {
 
 //Object for the playable fish
 function PlayerFish(src, x, y){
-    var hp = 100;
+    this.hp = 100;
     var is_alive = true;
     this.x = x;
     this.y = y;
@@ -40,21 +40,11 @@ function obstacleSystem(numObstacles) {
     }
 }
 
-obstacleSystem(10);
-var player = new PlayerFish("http://people.ucsc.edu/~aespejo/120/ASG2/Fish2.png", 0, 0);
+obstacleSystem(3);
+var player = new PlayerFish("http://people.ucsc.edu/~aespejo/120/ASG2/Fish2.png", 0, 200);
+var deadPlayer = new PlayerFish()
 
 
-function draw() {
-    context.drawImage(bgImage, 0, 0);
-    context.fillText(score,400,50);
-
-    contextfont="20px Georgia";
-    context.drawImage(player.image, player.x, player.y);
-    for(var i = 0; i < obstacles.length; i++){
-        var obst  = obstacles[i];
-        obst.draw(obst.x, obst.y);
-    }
-}
 
 document.addEventListener("keydown", handleKeyDown);
 
@@ -73,6 +63,26 @@ function handleKeyDown(e) {
 
 
 }
+
+function draw() {
+    context.drawImage(bgImage, 0, 0);
+    contextfont="20px Georgia";
+    context.fillText("SCORE: " + score,550,20);
+
+
+    if(player.hp > 0) {
+        context.drawImage(player.image, player.x, player.y);
+        context.fillText("Health: " + player.hp , 50, 20);
+    }else{
+
+        context.fillText("Health: 0"  , 50, 20);
+    }
+    for(var i = 0; i < obstacles.length; i++){
+        var obst  = obstacles[i];
+        obst.draw(obst.x, obst.y);
+    }
+}
+
 function update() {
     //Update for the obstacles
     for(var i = 0; i < obstacles.length; i++){
@@ -100,6 +110,7 @@ function update() {
         if(isCollide(player,obstacles[i])){
             player.hp -= 1;
             console.log("COLLISION");
+            console.log(player.hp);
         }
     }
     //Checking if fish collides with obstacles
@@ -109,14 +120,10 @@ function update() {
 }
 
 function isCollide(pFish, trash) {
-    if(pFish.x < trash.x + trash.trashImage.width &&
+    return pFish.x < trash.x + trash.trashImage.width &&
         pFish.x + pFish.image.width > trash.x &&
         pFish.y < trash.y + trash.trashImage.height &&
-        pFish.y + pFish.image.height > trash.y){
-        return true;
-    }else{
-        return false;
-    }
+        pFish.y + pFish.image.height > trash.y;
 }
 
 function game_loop() {
