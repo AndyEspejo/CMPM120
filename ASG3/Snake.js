@@ -19,6 +19,7 @@ $(document).ready(function () {
     var energy;
     var snakeArray; // An array of snake cells
     var canMove = true;  //Credit to Bradley Matias on Piazza for the bug fix
+    var gameOver = false;
 
     //All of the possible pellets that appear
     var food;
@@ -26,6 +27,7 @@ $(document).ready(function () {
         d = "right";
         createSnake();
         createFood();
+        createEnergy();
         score = 0;
         energy = 500;
         if(typeof game_loop != "undefined") clearInterval(game_loop);
@@ -46,9 +48,17 @@ $(document).ready(function () {
     //Used to create food in a random location
     function createFood(){
         food = {
-            x: Math.round(Math.random()*(w-cw)/cw),
-            y: Math.round(Math.random()*(h-cw)/cw)
+            x: Math.round(Math.random() * (w-cw)/cw),
+            y: Math.round(Math.random() * (h-cw)/cw)
     }
+    }
+
+    //Used to create an energy pellet at a random location
+    function createEnergy() {
+        energyPellet = {
+            x: Math.round(Math.random() * (w - cw) / cw),
+            y: Math.round(Math.random() * (h - cw) / cw)
+        }
     }
 
     function draw() {
@@ -65,14 +75,20 @@ $(document).ready(function () {
         else if(d == "up") ny--;
         else if(d == "down") ny++;
 
-        if(nx == -1 || nx == w/cw || ny == -1 || ny == h/cw || isCollide(nx, ny, snakeArray)) {
-            //restart game
-            
-            init();
-
+        if(isGameOver(nx, ny, energy)){
+            //init();
             return;
         }
 
+        //This will check if the snake grabs an energy pellet
+        if(nx == energyPellet.x && ny == energyPellet.y) {
+            if (energy < 400) {
+                energy += 100;
+            }else{
+                energy += (500-energy);
+            }
+            createEnergy();
+        }
         //This causes movement for the snake by making the tail the new head
         //If in the current loop the snake gets food, instead of moving tail we create a new head
         //Also, if that's the case we create more food
@@ -88,8 +104,11 @@ $(document).ready(function () {
 
         //This takes the above logic and sets the front of the array to the appropriate value
         snakeArray.unshift(newHead);
+
+
         //The following lines all just draw everything we need
         drawCell("food", food.x, food.y);
+        drawCell("energy", energyPellet.x, energyPellet.y);
         //This loop will draw a cell for the total size of the snake
         for(var i = 0; i < snakeArray.length; i++ ) {
             var c = snakeArray[i];
@@ -98,19 +117,31 @@ $(document).ready(function () {
         var score_text = "Score: " + score;
         var energy_text = "Energy: " + energy/5;
         context.fillText(score_text, 5, h-5);
-        context.fillText(energy_text, w-60, h-5);
+        context.fillText(energy_text, w-63, h-5);
     }
 
     function update() {
         energy--;
         canMove = true;
-        draw();
+        if(!gameOver) {
+            draw();
+        }else{
+            context.fillText("GAME OVER", 300, h-5);
+        }
+
+
 
     }
 
-    //Checks all of the game over clauses and returns true if any of them happen
-    function isGameOver(){
-        
+    //Checks for any case where the game should end, will be checked after every movement
+    function isGameOver(nx, ny, energy) {
+        if(nx == -1 || nx == w/cw || ny == -1 || ny == h/cw || isCollide(nx, ny, snakeArray)){
+            gameOver = true
+        }
+        if(energy <= 0){
+            gameOver = true;
+
+        }
 
     }
 
@@ -132,7 +163,7 @@ $(document).ready(function () {
             case "food":
                 context.fillStyle = "white";
                 break;
-            case "poison":
+            case "energy":
                 context.fillStyle = "red";
                 break;
             case "shrink":
