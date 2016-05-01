@@ -16,6 +16,7 @@ $(document).ready(function () {
     var cw = 10; //The width of the cell that make up the snake
     var d;       // The direction of the snake
     var score;
+    var energy;
     var snakeArray; // An array of snake cells
     var canMove = true;  //Credit to Bradley Matias on Piazza for the bug fix
 
@@ -25,7 +26,11 @@ $(document).ready(function () {
         d = "right";
         createSnake();
         createFood();
-        var game_loop = setInterval(update, 60);
+        score = 0;
+        energy = 500;
+        if(typeof game_loop != "undefined") clearInterval(game_loop);
+        game_loop = setInterval(update, 60);
+        console.log(game_loop);
     }
     init();
 
@@ -54,18 +59,26 @@ $(document).ready(function () {
         var nx = snakeArray[0].x;
         var ny = snakeArray[0].y;
 
-        //Snake will move bases on the last pressed direction
+        //Snake will move based on the last pressed direction
         if(d == "right") nx++;
         else if(d == "left") nx--;
         else if(d == "up") ny--;
         else if(d == "down") ny++;
-        
+
+        if(nx == -1 || nx == w/cw || ny == -1 || ny == h/cw || isCollide(nx, ny, snakeArray)) {
+            //restart game
+            
+            init();
+
+            return;
+        }
 
         //This causes movement for the snake by making the tail the new head
         //If in the current loop the snake gets food, instead of moving tail we create a new head
         //Also, if that's the case we create more food
         if(nx == food.x && ny == food.y){
             var newHead = {x: nx, y: ny};
+            score++;
             createFood();
         }else{
             newHead = snakeArray.pop();
@@ -82,11 +95,22 @@ $(document).ready(function () {
             var c = snakeArray[i];
             drawCell("snake", c.x, c.y)
         }
+        var score_text = "Score: " + score;
+        var energy_text = "Energy: " + energy/5;
+        context.fillText(score_text, 5, h-5);
+        context.fillText(energy_text, w-60, h-5);
     }
 
     function update() {
+        energy--;
         canMove = true;
         draw();
+
+    }
+
+    //Checks all of the game over clauses and returns true if any of them happen
+    function isGameOver(){
+        
 
     }
 
