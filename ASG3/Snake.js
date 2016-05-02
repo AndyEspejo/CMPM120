@@ -13,21 +13,28 @@ $(document).ready(function () {
     var h = $("#canvas").height();
 
     //Variables for the snake
-    var cw = 10; //The width of the cell that make up the snake
+    var cw = 25; //The width of the cell that make up the snake
     var d;       // The direction of the snake
     var score;
     var energy;
     var snakeArray; // An array of snake cells
     var canMove = true;  //Credit to Bradley Matias on Piazza for the bug fix
     var gameOver = false;
+    var highScore = 0;
+    var reason;
 
     //All of the possible pellets that appear
     var food;
+    var energyPellet;
+    var poisonPellet;
+    var shrinkingPellet
     function init() {
         d = "right";
         createSnake();
         createFood();
         createEnergy();
+        createPoison();
+        createShrinking();
         score = 0;
         energy = 500;
         if(typeof game_loop != "undefined") clearInterval(game_loop);
@@ -52,7 +59,6 @@ $(document).ready(function () {
             y: Math.round(Math.random() * (h-cw)/cw)
     }
     }
-
     //Used to create an energy pellet at a random location
     function createEnergy() {
         energyPellet = {
@@ -60,6 +66,25 @@ $(document).ready(function () {
             y: Math.round(Math.random() * (h - cw) / cw)
         }
     }
+
+    //Used to create shrinking pellet
+    function createShrinking() {
+        shrinkingPellet = {
+            x: Math.round(Math.random() * (w - cw) / cw),
+            y: Math.round(Math.random() * (h - cw) / cw)
+        }
+
+    }
+
+    //Used to create poison pellet in the area around a food or energy pellet
+    function createPoison() {
+        poisonPellet = {
+            x: Math.round(Math.random() * (w - cw) / cw),
+            y: Math.round(Math.random() * (h - cw) / cw)
+        }
+
+    }
+
 
     function draw() {
         //Draw Background
@@ -76,8 +101,18 @@ $(document).ready(function () {
         else if(d == "down") ny++;
 
         if(isGameOver(nx, ny, energy)){
-            //init();
             return;
+        }
+
+        //Checks if you touched shrinking pellet
+        if(nx == shrinkingPellet.x && ny == shrinkingPellet.y) {
+            snakeArray.pop();
+            createShrinking()
+        }
+        //Checks if you touched a poison pellet
+        if(nx == poisonPellet.x && ny == poisonPellet.y) {
+            energy -= 100;
+            createPoison();
         }
 
         //This will check if the snake grabs an energy pellet
@@ -96,6 +131,7 @@ $(document).ready(function () {
             var newHead = {x: nx, y: ny};
             score++;
             createFood();
+            createPoison();
         }else{
             newHead = snakeArray.pop();
             newHead.x = nx;
@@ -109,15 +145,43 @@ $(document).ready(function () {
         //The following lines all just draw everything we need
         drawCell("food", food.x, food.y);
         drawCell("energy", energyPellet.x, energyPellet.y);
+        drawCell("poison", poisonPellet.x, poisonPellet.y);
+        drawCell("shrink", shrinkingPellet.x, shrinkingPellet.y);
         //This loop will draw a cell for the total size of the snake
         for(var i = 0; i < snakeArray.length; i++ ) {
             var c = snakeArray[i];
             drawCell("snake", c.x, c.y)
         }
         var score_text = "Score: " + score;
-        var energy_text = "Energy: " + energy/5;
+        var energy_text = "Energy: " + Math.round(energy/5);
+
+        context.textBaseline = 'alphabetic';
+        context.textAlign = "left";
+        context.font = "15px Courier New bold";
         context.fillText(score_text, 5, h-5);
-        context.fillText(energy_text, w-63, h-5);
+        context.fillText(energy_text, w-90, h-5);
+    }
+    
+    function drawGameOver() {
+        context.fillStyle = "black";
+        context.fillRect(0,0,w,h);
+
+        context.fillStyle = "red";
+
+        context.textBaseline = 'middle';
+        context.textAlign = "center";
+
+        context.font = "35px Courier New bold";
+        context.fillText("GAME OVER", w/2, 30);
+        context.font = "30px Courier New Bold";
+        context.fillText("High Score: " + highScore, w/2, h/2);
+
+        context.font = "20px Courier New Bold";
+        context.fillText(reason, w/2, 100);
+
+        context.fillText("Press spacebar to restart!", w/2, h-30);
+
+        
     }
 
     function update() {
@@ -126,7 +190,8 @@ $(document).ready(function () {
         if(!gameOver) {
             draw();
         }else{
-            context.fillText("GAME OVER", 300, h-5);
+            if(score > highScore) highScore = score;
+            drawGameOver();
         }
 
 
@@ -135,11 +200,17 @@ $(document).ready(function () {
 
     //Checks for any case where the game should end, will be checked after every movement
     function isGameOver(nx, ny, energy) {
-        if(nx == -1 || nx == w/cw || ny == -1 || ny == h/cw || isCollide(nx, ny, snakeArray)){
+        if(isCollide(nx, ny, snakeArray)){
             gameOver = true
+            reason = "Tried to eat yourself ( ͡° ͜ʖ ͡°)"
+        }
+        if(nx == -1 || nx == w/cw || ny == -1 || ny == h/cw){
+            gameOver = true;
+            reason = "Crashed into the wall (ノಠ益ಠ)ノ彡┻━┻"
         }
         if(energy <= 0){
             gameOver = true;
+            reason = "Ran out of energy! You need some POWERTHIRST"
 
         }
 
@@ -166,6 +237,9 @@ $(document).ready(function () {
             case "energy":
                 context.fillStyle = "red";
                 break;
+            case "poison":
+                context.fillStyle = "black";
+                break;
             case "shrink":
                 context.fillStyle = "blue";
                 break;
@@ -179,12 +253,16 @@ $(document).ready(function () {
     //Controls for snake
     $(document).keydown(function (e) {
         var key = e.which;
-        if(key == "37" && d != "right") d = "left";
-        else if(key == "38" && d != "down") d = "up";
-        else if(key == "39" && d != "left") d = "right";
-        else if(key == "40" && d != "up") d = "down";
-        canMove = false;
+        if(canMove && key == "37" && d != "right") d = "left";
+        else if(canMove && key == "38" && d != "down") d = "up";
+        else if(canMove && key == "39" && d != "left") d = "right";
+        else if(canMove && key == "40" && d != "up") d = "down";
+        else if(key ==  "32" && gameOver) {
+            gameOver = false;
+            init();
 
+        }
+        canMove = false;
 
     })
 })
